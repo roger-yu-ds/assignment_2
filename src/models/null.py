@@ -2,15 +2,16 @@ import pandas as pd
 import numpy as np
 from statistics import mode
 from sklearn.preprocessing import LabelEncoder
-
+from sklearn.preprocessing import OneHotEncoder
 
 class NullModel():
-    def __init__(self, target_type: str = 'regression'):
+    def __init__(self, target_type: str = 'classification'):
         self.target_type = target_type
         self.y = None
         self.pred_value = None
         self.preds = None
-        self.le = None
+        self.ohe = OneHotEncoder()
+        self.le = LabelEncoder()
 
     def fit(self, y):
         self.y = y
@@ -18,20 +19,15 @@ class NullModel():
             self.pred_value = y.mean()
         else:
             if y.nunique() > 2:
-                self.le = LabelEncoder()
-                self.le.fit(y)
-                y_enc = self.le.transform(y)
-                self.pred_value = mode(y_enc)
+                self.ohe.fit(pd.DataFrame({'y': y}))
+                self.pred_value = mode(y)
 
     def get_length(self, y):
         return len(self.y)
 
     def predict(self, y):
-        self.preds = [self.pred_value] * self.get_length(y)
-
-        if self.le is not None:
-            self.preds =
-
+        preds_df = pd.DataFrame({'preds': [self.pred_value] * self.get_length(y)})
+        self.preds = self.ohe.transform(preds_df)
 
         return self.preds
 
