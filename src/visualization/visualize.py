@@ -4,6 +4,11 @@ import pandas as pd
 import seaborn as sns
 from typing import List
 from sklearn.calibration import calibration_curve
+from pathlib import Path, WindowsPath
+from dotenv import find_dotenv
+
+project_dir = Path(find_dotenv()).parent
+reports_dir = project_dir / 'reports'
 
 
 def classification_reports(classifier, X, y, verbose=False):
