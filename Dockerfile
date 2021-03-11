@@ -1,11 +1,21 @@
-FROM jupyter/scipy-notebook:0ce64578df46
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7
 
-RUN pip install torch==1.7.1+cu110 torchvision==0.8.2+cu110 torchtext==0.8.1 -f https://download.pytorch.org/whl/torch_stable.html
+WORKDIR /
 
-RUN jupyter labextension install @jupyterlab/toc
+COPY requirements.txt .
 
-ENV PYTHONPATH "${PYTHONPATH}:/home/jovyan/work"
+RUN python -m pip install --upgrade pip
 
-RUN echo "export PYTHONPATH=/home/jovyan/work" >> ~/.bashrc
+RUN pip3 install -r requirements.txt
 
-WORKDIR /home/jovyan/work
+RUN pip3 install torch==1.7.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
+
+COPY ./app /app
+
+COPY ./models /models
+
+COPY ./src /src
+
+RUN echo "$PWD"
+
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "-c", "/gunicorn_conf.py", "main:app"]
