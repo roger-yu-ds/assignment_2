@@ -17,15 +17,16 @@ class PytorchClassification(nn.Module):
     def __init__(self, n_features: int, n_classes: int):
         super().__init__()
         self.layer_1 = nn.Linear(n_features, 512)
+        self.batchnorm1 = nn.BatchNorm1d(512)
         self.layer_2 = nn.Linear(512, 128)
+        self.batchnorm2 = nn.BatchNorm1d(128)
         self.layer_3 = nn.Linear(128, 64)
+        self.batchnorm3 = nn.BatchNorm1d(64)
         self.layer_out = nn.Linear(64, n_classes)
 
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(p=0.2)
-        self.batchnorm1 = nn.BatchNorm1d(512)
-        self.batchnorm2 = nn.BatchNorm1d(128)
-        self.batchnorm3 = nn.BatchNorm1d(64)
+
 
     def forward(self, x):
         x = self.layer_1(x)
