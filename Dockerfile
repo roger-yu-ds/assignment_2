@@ -16,6 +16,4 @@ COPY ./models /models
 
 COPY ./src /src
 
-RUN echo "$PWD"
-
 CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "-c", "/gunicorn_conf.py", "app.main:app"]
