@@ -1,7 +1,20 @@
 assignment_2
 ==============================
 
-A short description of the project.
+This project is assignment 2 of the MDSI (Master of Data Science and 
+Innovation) degree, subject ADSI (Advanced Data Science for Innovation), at 
+UTS. There are two parts to this project; 
+1. Modelling: this constitutes cleaning the data, applying tranformations and 
+fitting a model, including all the hyperparameter tuning.
+   
+2. Deployment: Creating a docker image and deploying the image to Heroku
+
+Modelling
+-------------
+
+Deployment
+-------------
+
 
 Project Organization
 ------------
