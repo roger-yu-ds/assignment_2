@@ -57,9 +57,13 @@ def predict_one(brewery_name: str,
                 review_palate: int,
                 review_taste: int):
     """
-
-    :param Observation:
-    :return:
+    Produces a single prediction for a single observation.
+    - **brewery_name**:      a single brewery name
+    - **review_aroma**:      a single review aroma
+    - **review_appearance**: a single review appearance
+    - **review_palate**:     a single review palate
+    - **review_taste**:      a single review taste
+    - **return**:            JSON of the prediction
     """
     device = get_device()
     df = pd.DataFrame({'brewery_name': [brewery_name],
@@ -68,10 +72,15 @@ def predict_one(brewery_name: str,
                        'review_palate': [review_palate],
                        'review_taste': [review_taste]})
 
+    # Encoding the data for prediction
     pipe = load_preprocessing_pipe('pipe.sav')
     df_trans = pipe.transform(df)
     df_tensor = torch.Tensor(np.array(df_trans)).to(device)
+
+    # Prediction
     pred = model(df_tensor).argmax(1)
+
+    # Decode results to produce human readable classes
     le = load_label_encoder('label_encoder.sav')
     pred_name = le.inverse_transform(pred.tolist())[0]
 
@@ -85,7 +94,7 @@ def predict_many(brewery_name: List[str] = Query(None),
                  review_palate: List[int] = Query(None),
                  review_taste: List[int] = Query(None)):
     """
-
+    Predict multiple observations.
     - **brewery_name**:      list of brewery names
     - **review_aroma**:      list of review aroma
     - **review_appearance**: list of review appearance
@@ -100,10 +109,15 @@ def predict_many(brewery_name: List[str] = Query(None),
                        'review_palate': review_palate,
                        'review_taste': review_taste})
 
+    # Encoding the data for prediction
     pipe = load_preprocessing_pipe('pipe.sav')
     df_trans = pipe.transform(df)
     df_tensor = torch.Tensor(np.array(df_trans)).to(device)
+
+    # Prediction
     pred = model(df_tensor).argmax(1)
+
+    # Decode results to produce human readable classes
     le = load_label_encoder('label_encoder.sav')
     pred_names = list(le.inverse_transform(pred.tolist()))
 
