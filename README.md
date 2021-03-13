@@ -11,10 +11,15 @@ fitting a model, including all the hyperparameter tuning.
 
 Modelling
 -------------
+All model artefacts are saved into the `/models` directory. Each of the 
+experimental models will have a prefix, e.g. `2_pytorch`. The best 
+performing model will be duplicated and named `model`. Accordingly, the other
+artefacts that support `model` will be named `pipeline.sav` and 
+`label_encoder.sav`.
 
 Deployment
 -------------
-
+The deployment is done using a Dockerfile, which is sent to Heroku.
 
 Project Organization
 ------------
