@@ -48,6 +48,89 @@ class PytorchClassification(nn.Module):
         return x
 
 
+class PytorchClassification_4(nn.Module):
+    def __init__(self, n_features: int, n_classes: int):
+        super().__init__()
+        self.layer_1 = nn.Linear(n_features, 1024)
+        self.batchnorm1 = nn.BatchNorm1d(1024)
+        self.layer_2 = nn.Linear(1024, 256)
+        self.batchnorm2 = nn.BatchNorm1d(256)
+        self.layer_3 = nn.Linear(256, 128)
+        self.batchnorm3 = nn.BatchNorm1d(128)
+        self.layer_4 = nn.Linear(128, 64)
+        self.batchnorm4 = nn.BatchNorm1d(64)
+        self.layer_out = nn.Linear(64, n_classes)
+
+        self.relu = nn.ReLU()
+        self.dropout = nn.Dropout(p=0.2)
+
+
+    def forward(self, x):
+        x = self.layer_1(x)
+        x = self.batchnorm1(x)
+        x = self.relu(x)
+
+        x = self.layer_2(x)
+        x = self.batchnorm2(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+
+        x = self.layer_3(x)
+        x = self.batchnorm3(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+
+        x = self.layer_4(x)
+        x = self.batchnorm4(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+
+        x = self.layer_out(x)
+
+        return x
+
+
+class PytorchClassification_5(nn.Module):
+    def __init__(self, n_features: int, n_classes: int):
+        super().__init__()
+        self.layer_1 = nn.Linear(n_features, 2048)
+        self.batchnorm1 = nn.BatchNorm1d(2048)
+        self.layer_2 = nn.Linear(2048, 512)
+        self.batchnorm2 = nn.BatchNorm1d(512)
+        self.layer_3 = nn.Linear(512, 256)
+        self.batchnorm3 = nn.BatchNorm1d(256)
+        self.layer_4 = nn.Linear(256, 64)
+        self.batchnorm4 = nn.BatchNorm1d(64)
+        self.layer_out = nn.Linear(64, n_classes)
+
+        self.relu = nn.ReLU()
+        self.dropout = nn.Dropout(p=0.2)
+
+
+    def forward(self, x):
+        x = self.layer_1(x)
+        x = self.batchnorm1(x)
+        x = self.relu(x)
+
+        x = self.layer_2(x)
+        x = self.batchnorm2(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+
+        x = self.layer_3(x)
+        x = self.batchnorm3(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+
+        x = self.layer_4(x)
+        x = self.batchnorm4(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+
+        x = self.layer_out(x)
+
+        return x
+
 class PytorchDataset(Dataset):
     """
     Pytorch dataset
