@@ -19,7 +19,7 @@ artefacts that support `model` will be named `pipeline.sav` and
 ## Deployment
 
 The deployment is done using the `/Dockerfile` and the `heroku/yml`, which is 
-sent to Heroku.
+sent to Heroku; the url is https://adsi-ass2.herokuapp.com/. 
 
 The files/directories required for production are:
 * `/app`: which contains the code to run the FastAPI app
