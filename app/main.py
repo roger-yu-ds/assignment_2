@@ -36,7 +36,14 @@ def read_root():
                               '`review_performance`, `review_appearance`, '
                               '`review_palate`, and `review_taste',
         'List of endpoints': ["/", "/health/", "/beer/type/", "/beers/type/",
-                              "/model/architecture/"]}
+                              "/model/architecture/"],
+        'Inputs': {'`brewery_name`': 'str or List[str]',
+                   '`review_performance`': 'float or List[float]',
+                   '`review_appearance`': 'float or List[float]',
+                   '`review_palate`': 'float or List[float]',
+                   '`review_palate`': 'float or List[float]'},
+        'GitHub link': 'https://github.com/roger-yu-ds/assignment_2'
+    }
 
     response = JSONResponse(content=root_dict, status_code=200)
 
@@ -50,10 +57,10 @@ def healthcheck():
 
 @app.post('/beer/type')
 def predict_one(brewery_name: str,
-                review_aroma: int,
-                review_appearance: int,
-                review_palate: int,
-                review_taste: int):
+                review_aroma: float,
+                review_appearance: float,
+                review_palate: float,
+                review_taste: float):
     """
     Produces a single prediction for a single observation.
     - **brewery_name**:      a single brewery name
@@ -87,10 +94,10 @@ def predict_one(brewery_name: str,
 
 @app.post('/beer/types')
 def predict_many(brewery_name: List[str] = Query(None),
-                 review_aroma: List[int] = Query(None),
-                 review_appearance: List[int] = Query(None),
-                 review_palate: List[int] = Query(None),
-                 review_taste: List[int] = Query(None)):
+                 review_aroma: List[float] = Query(None),
+                 review_appearance: List[float] = Query(None),
+                 review_palate: List[float] = Query(None),
+                 review_taste: List[float] = Query(None)):
     """
     Predict multiple observations.
     - **brewery_name**:      list of brewery names
@@ -124,11 +131,6 @@ def predict_many(brewery_name: List[str] = Query(None),
 
 @app.get('/model/architecture/')
 def get_architecture():
-    """
-
-    :param model:
-    :return:
-    """
     architecture_dict = {
         layer.split(':')[0][2:]: layer.split(':')[1]
         for layer in model.__str__().split('\n')[1:-1]
