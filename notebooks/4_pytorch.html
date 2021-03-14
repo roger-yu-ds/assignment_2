@@ -2,7 +2,7 @@
 <html>
 <head><meta charset="utf-8" />
 
-<title>4_pytorch</title>
+<title>3_pytorch</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
@@ -13100,25 +13100,21 @@ $( document ).ready(function(){
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="Introduction">Introduction<a class="anchor-link" href="#Introduction">&#182;</a></h1><p>This notebook predicts the <code>beer_style</code> using a neural network on the PyTorch
-framework. It is a modification of the 2_pytorch.ipynb notebook. Previous
-results have indicated that the model might not be complex enough, i.e. the
-validation and test accuracies are similar and low. This is also a reasonable
-hypothesis because there are many rows with a very smaller number
-of features.</p>
-<p>This notebook will increase the number of neurons as well as add another layer.</p>
+framework. It is a modification of the 2_pytorch.ipynb notebook. The low
+frequency <code>brewery_name</code>s will be merged into a new category called 'other'.</p>
 <h2 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h2><p>Reducing the number of unique <code>brewery_names</code> did not lead to a model with
 better performance. The <a href="#Classification-report">classification report</a> shows
-that the test accuracy</p>
+that the test accuracy is 0.27. A decrease from the previous attempt (0.3).</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[30]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">artefact_prefix</span> <span class="o">=</span> <span class="s1">&#39;4_pytorch&#39;</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">artefact_prefix</span> <span class="o">=</span> <span class="s1">&#39;3_pytorch&#39;</span>
 <span class="n">target</span> <span class="o">=</span> <span class="s1">&#39;beer_style&#39;</span>
 </pre></div>
 
@@ -13129,7 +13125,7 @@ that the test accuracy</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
@@ -13143,7 +13139,7 @@ that the test accuracy</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="prompt input_prompt">In&nbsp;[48]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">find_dotenv</span>
@@ -13154,6 +13150,7 @@ that the test accuracy</p>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">from</span> <span class="nn">torchviz</span> <span class="kn">import</span> <span class="n">make_dot</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DataLoader</span>
 <span class="kn">from</span> <span class="nn">category_encoders.binary</span> <span class="kn">import</span> <span class="n">BinaryEncoder</span>
 <span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span>
@@ -13168,7 +13165,7 @@ that the test accuracy</p>
 <span class="kn">from</span> <span class="nn">src.data.sets</span> <span class="kn">import</span> <span class="n">split_sets_random</span>
 <span class="kn">from</span> <span class="nn">src.data.sets</span> <span class="kn">import</span> <span class="n">test_class_exclusion</span>
 <span class="kn">from</span> <span class="nn">src.models.performance</span> <span class="kn">import</span> <span class="n">convert_cr_to_dataframe</span>
-<span class="kn">from</span> <span class="nn">src.models.pytorch</span> <span class="kn">import</span> <span class="n">PytorchClassification_4</span>
+<span class="kn">from</span> <span class="nn">src.models.pytorch</span> <span class="kn">import</span> <span class="n">PytorchClassification</span>
 <span class="kn">from</span> <span class="nn">src.models.pytorch</span> <span class="kn">import</span> <span class="n">get_device</span>
 <span class="kn">from</span> <span class="nn">src.models.pytorch</span> <span class="kn">import</span> <span class="n">train_classification</span>
 <span class="kn">from</span> <span class="nn">src.models.pytorch</span> <span class="kn">import</span> <span class="n">test_classification</span>
@@ -13191,7 +13188,7 @@ that the test accuracy</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">project_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">find_dotenv</span><span class="p">())</span><span class="o">.</span><span class="n">parent</span>
@@ -13211,16 +13208,146 @@ that the test accuracy</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Load-data">Load data<a class="anchor-link" href="#Load-data">&#182;</a></h1>
+<h1 id="Load-raw-data">Load raw data<a class="anchor-link" href="#Load-raw-data">&#182;</a></h1>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">X_val</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">y_val</span> <span class="o">=</span> <span class="n">load_sets</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">processed_data_dir</span> <span class="o">/</span> <span class="s1">&#39;subset.parquet&#39;</span><span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Merge-categories">Merge categories<a class="anchor-link" href="#Merge-categories">&#182;</a></h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">s</span> <span class="o">=</span> <span class="n">merge_categories</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">brewery_name</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="mi">500</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;brewery_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">brewery_name</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Split-data">Split data<a class="anchor-link" href="#Split-data">&#182;</a></h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_val</span><span class="p">,</span> <span class="n">y_val</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">split_sets_random</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">,</span> <span class="n">target_col</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">test_ratio</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">to_numpy</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">y_val</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">y_test</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X_train</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Check for excluded classes.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">test_class_exclusion</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">y_val</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -13241,7 +13368,7 @@ that the test accuracy</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
@@ -13257,7 +13384,7 @@ that the test accuracy</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">X_train_trans</span> <span class="o">=</span> <span class="n">pipe</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
@@ -13272,7 +13399,7 @@ that the test accuracy</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">X_train_trans</span><span class="o">.</span><span class="n">shape</span>
@@ -13282,30 +13409,10 @@ that the test accuracy</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[13]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>(951968, 18)</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">n_features</span> <span class="o">=</span> <span class="n">X_train_trans</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -13316,30 +13423,10 @@ that the test accuracy</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[14]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>18</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">n_classes</span> <span class="o">=</span> <span class="n">y_train</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span>
@@ -13347,26 +13434,6 @@ that the test accuracy</p>
 </pre></div>
 
     </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[15]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>104</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -13381,7 +13448,7 @@ that the test accuracy</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">le</span> <span class="o">=</span> <span class="n">LabelEncoder</span><span class="p">()</span>
@@ -13394,57 +13461,16 @@ that the test accuracy</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>C:\Users\Roger\.conda\envs\adsi_ass_2\lib\site-packages\sklearn\preprocessing\_label.py:251: DataConversionWarning: A column-vector y was passed when a 1d array was expected. Please change the shape of y to (n_samples, ), for example using ravel().
-  y = column_or_1d(y, warn=True)
-C:\Users\Roger\.conda\envs\adsi_ass_2\lib\site-packages\sklearn\preprocessing\_label.py:268: DataConversionWarning: A column-vector y was passed when a 1d array was expected. Please change the shape of y to (n_samples, ), for example using ravel().
-  y = column_or_1d(y, warn=True)
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">y_test_trans</span>
 </pre></div>
 
     </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[17]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>array([98, 89,  2, ..., 37, 94, 98])</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -13458,7 +13484,7 @@ C:\Users\Roger\.conda\envs\adsi_ass_2\lib\site-packages\sklearn\preprocessing\_l
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="n">get_device</span><span class="p">()</span>
@@ -13469,30 +13495,10 @@ C:\Users\Roger\.conda\envs\adsi_ass_2\lib\site-packages\sklearn\preprocessing\_l
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[18]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>device(type=&#39;cuda&#39;, index=0)</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[19]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">train_dataset</span> <span class="o">=</span> <span class="n">PytorchDataset</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X_train_trans</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_train_trans</span><span class="p">)</span>
@@ -13514,53 +13520,20 @@ C:\Users\Roger\.conda\envs\adsi_ass_2\lib\site-packages\sklearn\preprocessing\_l
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[22]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">PytorchClassification_4</span><span class="p">(</span><span class="n">n_features</span><span class="o">=</span><span class="n">n_features</span><span class="p">,</span> <span class="n">n_classes</span><span class="o">=</span><span class="n">n_classes</span><span class="p">)</span>
-<span class="n">model</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">PytorchClassification</span><span class="p">(</span><span class="n">n_features</span><span class="o">=</span><span class="n">n_features</span><span class="p">,</span> <span class="n">n_classes</span><span class="o">=</span><span class="n">n_classes</span><span class="p">)</span>
 </pre></div>
 
     </div>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[22]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>PytorchClassification_4(
-  (layer_1): Linear(in_features=18, out_features=1024, bias=True)
-  (batchnorm1): BatchNorm1d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-  (layer_2): Linear(in_features=1024, out_features=256, bias=True)
-  (batchnorm2): BatchNorm1d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-  (layer_3): Linear(in_features=256, out_features=128, bias=True)
-  (batchnorm3): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-  (layer_4): Linear(in_features=128, out_features=64, bias=True)
-  (batchnorm4): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-  (layer_out): Linear(in_features=64, out_features=104, bias=True)
-  (relu): ReLU()
-  (dropout): Dropout(p=0.2, inplace=False)
-)</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
@@ -13570,42 +13543,10 @@ C:\Users\Roger\.conda\envs\adsi_ass_2\lib\site-packages\sklearn\preprocessing\_l
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[23]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>PytorchClassification_4(
-  (layer_1): Linear(in_features=18, out_features=1024, bias=True)
-  (batchnorm1): BatchNorm1d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-  (layer_2): Linear(in_features=1024, out_features=256, bias=True)
-  (batchnorm2): BatchNorm1d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-  (layer_3): Linear(in_features=256, out_features=128, bias=True)
-  (batchnorm3): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-  (layer_4): Linear(in_features=128, out_features=64, bias=True)
-  (batchnorm4): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-  (layer_out): Linear(in_features=64, out_features=104, bias=True)
-  (relu): ReLU()
-  (dropout): Dropout(p=0.2, inplace=False)
-)</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[24]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
@@ -13618,7 +13559,7 @@ C:\Users\Roger\.conda\envs\adsi_ass_2\lib\site-packages\sklearn\preprocessing\_l
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[25]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
@@ -13638,11 +13579,11 @@ C:\Users\Roger\.conda\envs\adsi_ass_2\lib\site-packages\sklearn\preprocessing\_l
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[26]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">N_EPOCHS</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">1024</span>
+<span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">512</span>
 <span class="n">scheduler</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">StepLR</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
 </pre></div>
 
@@ -13653,7 +13594,7 @@ C:\Users\Roger\.conda\envs\adsi_ass_2\lib\site-packages\sklearn\preprocessing\_l
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[27]:</div>
+<div class="prompt input_prompt">In&nbsp;[47]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">start_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
@@ -13696,69 +13637,69 @@ C:\Users\Roger\.conda\envs\adsi_ass_2\lib\site-packages\sklearn\preprocessing\_l
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Started: 2021-03-12 20:59:13.507343
+<pre>Started: 2021-03-12 20:35:51.281585
 Epoch: 0
-	(train)	Loss: 0.0032	|	Acc: 18.8%
-	(valid)	Loss: 0.0028	|	Acc: 25.8%
+	(train)	Loss: 0.0054	|	Acc: 24.9%
+	(valid)	Loss: 0.0051	|	Acc: 26.8%
 Epoch: 1
-	(train)	Loss: 0.0029	|	Acc: 23.7%
-	(valid)	Loss: 0.0026	|	Acc: 27.2%
+	(train)	Loss: 0.0054	|	Acc: 24.8%
+	(valid)	Loss: 0.0051	|	Acc: 26.8%
 Epoch: 2
-	(train)	Loss: 0.0028	|	Acc: 24.8%
-	(valid)	Loss: 0.0026	|	Acc: 27.9%
+	(train)	Loss: 0.0054	|	Acc: 24.9%
+	(valid)	Loss: 0.0051	|	Acc: 26.9%
 Epoch: 3
-	(train)	Loss: 0.0027	|	Acc: 25.4%
-	(valid)	Loss: 0.0025	|	Acc: 28.3%
+	(train)	Loss: 0.0054	|	Acc: 24.9%
+	(valid)	Loss: 0.0051	|	Acc: 26.9%
 Epoch: 4
-	(train)	Loss: 0.0027	|	Acc: 25.8%
-	(valid)	Loss: 0.0025	|	Acc: 28.5%
+	(train)	Loss: 0.0054	|	Acc: 24.9%
+	(valid)	Loss: 0.0051	|	Acc: 26.9%
 Epoch: 5
-	(train)	Loss: 0.0027	|	Acc: 26.1%
-	(valid)	Loss: 0.0025	|	Acc: 29.0%
+	(train)	Loss: 0.0054	|	Acc: 24.9%
+	(valid)	Loss: 0.0051	|	Acc: 26.9%
 Epoch: 6
-	(train)	Loss: 0.0026	|	Acc: 26.4%
-	(valid)	Loss: 0.0025	|	Acc: 29.0%
+	(train)	Loss: 0.0054	|	Acc: 24.8%
+	(valid)	Loss: 0.0051	|	Acc: 26.9%
 Epoch: 7
-	(train)	Loss: 0.0026	|	Acc: 26.6%
-	(valid)	Loss: 0.0024	|	Acc: 29.3%
+	(train)	Loss: 0.0054	|	Acc: 25.0%
+	(valid)	Loss: 0.0051	|	Acc: 26.9%
 Epoch: 8
-	(train)	Loss: 0.0026	|	Acc: 26.7%
-	(valid)	Loss: 0.0024	|	Acc: 29.4%
+	(train)	Loss: 0.0054	|	Acc: 25.0%
+	(valid)	Loss: 0.0051	|	Acc: 26.9%
 Epoch: 9
-	(train)	Loss: 0.0026	|	Acc: 26.8%
-	(valid)	Loss: 0.0024	|	Acc: 29.5%
+	(train)	Loss: 0.0054	|	Acc: 25.0%
+	(valid)	Loss: 0.0051	|	Acc: 27.0%
 Epoch: 10
-	(train)	Loss: 0.0026	|	Acc: 26.9%
-	(valid)	Loss: 0.0024	|	Acc: 29.5%
+	(train)	Loss: 0.0054	|	Acc: 25.0%
+	(valid)	Loss: 0.0051	|	Acc: 27.0%
 Epoch: 11
-	(train)	Loss: 0.0026	|	Acc: 27.1%
-	(valid)	Loss: 0.0024	|	Acc: 29.8%
+	(train)	Loss: 0.0054	|	Acc: 25.0%
+	(valid)	Loss: 0.0051	|	Acc: 27.0%
 Epoch: 12
-	(train)	Loss: 0.0026	|	Acc: 27.2%
-	(valid)	Loss: 0.0024	|	Acc: 29.8%
+	(train)	Loss: 0.0054	|	Acc: 25.0%
+	(valid)	Loss: 0.0051	|	Acc: 27.0%
 Epoch: 13
-	(train)	Loss: 0.0026	|	Acc: 27.3%
-	(valid)	Loss: 0.0024	|	Acc: 29.8%
+	(train)	Loss: 0.0054	|	Acc: 25.0%
+	(valid)	Loss: 0.0051	|	Acc: 27.0%
 Epoch: 14
-	(train)	Loss: 0.0026	|	Acc: 27.4%
-	(valid)	Loss: 0.0024	|	Acc: 29.9%
+	(train)	Loss: 0.0054	|	Acc: 25.0%
+	(valid)	Loss: 0.0051	|	Acc: 27.0%
 Epoch: 15
-	(train)	Loss: 0.0026	|	Acc: 27.4%
-	(valid)	Loss: 0.0024	|	Acc: 30.0%
+	(train)	Loss: 0.0054	|	Acc: 25.0%
+	(valid)	Loss: 0.0051	|	Acc: 27.0%
 Epoch: 16
-	(train)	Loss: 0.0026	|	Acc: 27.5%
-	(valid)	Loss: 0.0024	|	Acc: 30.1%
+	(train)	Loss: 0.0054	|	Acc: 25.0%
+	(valid)	Loss: 0.0051	|	Acc: 27.0%
 Epoch: 17
-	(train)	Loss: 0.0026	|	Acc: 27.5%
-	(valid)	Loss: 0.0024	|	Acc: 30.1%
+	(train)	Loss: 0.0054	|	Acc: 25.0%
+	(valid)	Loss: 0.0051	|	Acc: 27.0%
 Epoch: 18
-	(train)	Loss: 0.0026	|	Acc: 27.6%
-	(valid)	Loss: 0.0024	|	Acc: 30.1%
+	(train)	Loss: 0.0054	|	Acc: 25.1%
+	(valid)	Loss: 0.0051	|	Acc: 26.9%
 Epoch: 19
-	(train)	Loss: 0.0025	|	Acc: 27.7%
-	(valid)	Loss: 0.0024	|	Acc: 30.2%
-Ended: 2021-03-12 21:04:53.319427
-Runtime: 0:05:39.812084
+	(train)	Loss: 0.0054	|	Acc: 25.0%
+	(valid)	Loss: 0.0051	|	Acc: 26.9%
+Ended: 2021-03-12 20:42:20.673028
+Runtime: 0:06:29.391443
 </pre>
 </div>
 </div>
@@ -13776,7 +13717,7 @@ Runtime: 0:05:39.812084
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[28]:</div>
+<div class="prompt input_prompt">In&nbsp;[45]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">preds</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">test_dataset</span><span class="o">.</span><span class="n">X_tensor</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -13793,7 +13734,7 @@ Runtime: 0:05:39.812084
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[28]:</div>
+    <div class="prompt output_prompt">Out[45]:</div>
 
 
 
@@ -13824,7 +13765,7 @@ Runtime: 0:05:39.812084
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[29]:</div>
+<div class="prompt input_prompt">In&nbsp;[46]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">report</span> <span class="o">=</span> <span class="n">classification_report</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">le</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">preds</span><span class="o">.</span><span class="n">cpu</span><span class="p">()))</span>
@@ -13859,114 +13800,114 @@ Runtime: 0:05:39.812084
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>                                     precision    recall  f1-score   support
 
-                            Altbier       0.38      0.33      0.35      1521
-             American Adjunct Lager       0.55      0.75      0.63      6085
-           American Amber / Red Ale       0.19      0.24      0.21      9288
-         American Amber / Red Lager       0.27      0.34      0.30      1887
-                American Barleywine       0.23      0.01      0.02      5390
-                 American Black Ale       0.41      0.06      0.10      2394
-                American Blonde Ale       0.26      0.02      0.03      2594
-                 American Brown Ale       0.27      0.09      0.14      5066
+                            Altbier       0.33      0.33      0.33      1521
+             American Adjunct Lager       0.27      0.75      0.40      6085
+           American Amber / Red Ale       0.19      0.20      0.19      9288
+         American Amber / Red Lager       0.30      0.30      0.30      1887
+                American Barleywine       0.23      0.02      0.04      5390
+                 American Black Ale       0.41      0.05      0.08      2394
+                American Blonde Ale       0.20      0.01      0.02      2594
+                 American Brown Ale       0.25      0.07      0.11      5066
             American Dark Wheat Ale       0.00      0.00      0.00       296
-     American Double / Imperial IPA       0.28      0.34      0.31     17159
- American Double / Imperial Pilsner       0.06      0.00      0.01      1109
-   American Double / Imperial Stout       0.36      0.46      0.40     10187
-                       American IPA       0.19      0.53      0.28     23356
-               American Malt Liquor       0.76      0.21      0.33       759
-            American Pale Ale (APA)       0.18      0.18      0.18     12479
-                American Pale Lager       0.47      0.22      0.30      1871
-            American Pale Wheat Ale       0.19      0.17      0.18      4900
-                    American Porter       0.23      0.22      0.22     10097
-                     American Stout       0.21      0.29      0.25      4966
-                American Strong Ale       0.25      0.41      0.31      6335
-                  American Wild Ale       0.29      0.38      0.33      3494
-                      Baltic Porter       0.43      0.43      0.43      2322
-                   Belgian Dark Ale       0.00      0.00      0.00      1278
-                        Belgian IPA       0.41      0.15      0.22      2428
-                   Belgian Pale Ale       0.63      0.24      0.34      3954
-            Belgian Strong Dark Ale       0.39      0.39      0.39      7511
-            Belgian Strong Pale Ale       0.39      0.29      0.34      6181
-                 Berliner Weissbier       0.38      0.22      0.28       712
-    Bière de Champagne / Bière Brut       0.33      0.12      0.18       211
-                     Bière de Garde       0.50      0.37      0.42      1340
-                        Black &amp; Tan       0.99      0.15      0.26       459
-                               Bock       0.11      0.30      0.16      2323
-                            Braggot       0.17      0.09      0.11       207
-     California Common / Steam Beer       0.19      0.31      0.24       809
-                         Chile Beer       0.95      0.16      0.27       496
-                          Cream Ale       0.24      0.14      0.18      1052
-                     Czech Pilsener       0.67      0.34      0.45      2484
-                         Doppelbock       0.43      0.33      0.37      4380
-          Dortmunder / Export Lager       0.54      0.14      0.22       928
-                             Dubbel       0.37      0.09      0.15      4036
-                       Dunkelweizen       0.21      0.00      0.01      1426
-                            Eisbock       0.22      0.32      0.26       506
-                 English Barleywine       0.57      0.16      0.25      2798
-                     English Bitter       0.26      0.16      0.20      1783
-                  English Brown Ale       0.36      0.24      0.29      3870
-              English Dark Mild Ale       0.75      0.05      0.09       482
-       English India Pale Ale (IPA)       0.22      0.11      0.14      3218
-                   English Pale Ale       0.37      0.51      0.43      4631
+     American Double / Imperial IPA       0.27      0.32      0.29     17159
+ American Double / Imperial Pilsner       0.16      0.01      0.01      1109
+   American Double / Imperial Stout       0.34      0.47      0.40     10187
+                       American IPA       0.15      0.55      0.23     23356
+               American Malt Liquor       0.72      0.02      0.03       759
+            American Pale Ale (APA)       0.18      0.14      0.16     12479
+                American Pale Lager       0.47      0.17      0.25      1871
+            American Pale Wheat Ale       0.20      0.13      0.16      4900
+                    American Porter       0.24      0.19      0.21     10097
+                     American Stout       0.21      0.27      0.23      4966
+                American Strong Ale       0.24      0.41      0.30      6335
+                  American Wild Ale       0.31      0.35      0.33      3494
+                      Baltic Porter       0.38      0.33      0.35      2322
+                   Belgian Dark Ale       0.11      0.02      0.03      1278
+                        Belgian IPA       0.38      0.17      0.24      2428
+                   Belgian Pale Ale       0.42      0.22      0.29      3954
+            Belgian Strong Dark Ale       0.42      0.33      0.37      7511
+            Belgian Strong Pale Ale       0.43      0.23      0.30      6181
+                 Berliner Weissbier       0.56      0.12      0.20       712
+    Bière de Champagne / Bière Brut       0.29      0.02      0.04       211
+                     Bière de Garde       0.49      0.26      0.34      1340
+                        Black &amp; Tan       0.12      0.00      0.01       459
+                               Bock       0.12      0.31      0.17      2323
+                            Braggot       0.22      0.04      0.07       207
+     California Common / Steam Beer       0.21      0.25      0.23       809
+                         Chile Beer       0.10      0.00      0.01       496
+                          Cream Ale       0.22      0.11      0.15      1052
+                     Czech Pilsener       0.69      0.18      0.29      2484
+                         Doppelbock       0.45      0.28      0.34      4380
+          Dortmunder / Export Lager       0.16      0.02      0.03       928
+                             Dubbel       0.34      0.13      0.19      4036
+                       Dunkelweizen       0.15      0.00      0.01      1426
+                            Eisbock       0.27      0.22      0.24       506
+                 English Barleywine       0.65      0.15      0.24      2798
+                     English Bitter       0.13      0.06      0.08      1783
+                  English Brown Ale       0.41      0.22      0.29      3870
+              English Dark Mild Ale       0.25      0.00      0.00       482
+       English India Pale Ale (IPA)       0.18      0.07      0.11      3218
+                   English Pale Ale       0.39      0.38      0.38      4631
               English Pale Mild Ale       0.00      0.00      0.00       135
-                     English Porter       0.38      0.22      0.28      2225
-                      English Stout       0.38      0.07      0.12       605
-                 English Strong Ale       0.34      0.15      0.21       982
-                    Euro Dark Lager       0.29      0.10      0.15       916
-                    Euro Pale Lager       0.57      0.73      0.64      3673
-                  Euro Strong Lager       0.55      0.18      0.27       542
-Extra Special / Strong Bitter (ESB)       0.25      0.08      0.12      3539
+                     English Porter       0.29      0.16      0.20      2225
+                      English Stout       0.40      0.01      0.03       605
+                 English Strong Ale       0.25      0.12      0.16       982
+                    Euro Dark Lager       0.38      0.06      0.10       916
+                    Euro Pale Lager       0.54      0.36      0.43      3673
+                  Euro Strong Lager       0.57      0.02      0.04       542
+Extra Special / Strong Bitter (ESB)       0.24      0.05      0.08      3539
                                Faro       0.00      0.00      0.00       117
-                 Flanders Oud Bruin       0.42      0.27      0.33       944
-                   Flanders Red Ale       0.86      0.60      0.71      1332
-             Foreign / Export Stout       0.41      0.40      0.41      1185
-             Fruit / Vegetable Beer       0.27      0.35      0.30      6710
-                    German Pilsener       0.44      0.27      0.34      4416
-                               Gose       0.58      0.60      0.59       119
-                             Gueuze       0.67      0.35      0.46      1206
+                 Flanders Oud Bruin       0.40      0.19      0.26       944
+                   Flanders Red Ale       0.71      0.56      0.63      1332
+             Foreign / Export Stout       0.57      0.20      0.30      1185
+             Fruit / Vegetable Beer       0.25      0.36      0.29      6710
+                    German Pilsener       0.42      0.10      0.16      4416
+                               Gose       0.59      0.60      0.59       119
+                             Gueuze       0.63      0.35      0.45      1206
                            Happoshu       0.00      0.00      0.00        46
-                         Hefeweizen       0.36      0.29      0.32      5675
-               Herbed / Spiced Beer       0.43      0.04      0.08      2081
-                    Irish Dry Stout       0.64      0.52      0.57      2537
-                      Irish Red Ale       0.66      0.12      0.20      1572
-                Japanese Rice Lager       0.64      0.88      0.74       308
-         Keller Bier / Zwickel Bier       0.42      0.10      0.17       525
-                      Kristalweizen       0.20      0.04      0.07       426
-                              Kvass       0.00      0.00      0.00        63
-                             Kölsch       0.57      0.17      0.26      1678
-                     Lambic - Fruit       0.54      0.75      0.63      2152
+                         Hefeweizen       0.37      0.25      0.30      5675
+               Herbed / Spiced Beer       0.15      0.02      0.03      2081
+                    Irish Dry Stout       0.61      0.50      0.55      2537
+                      Irish Red Ale       0.84      0.08      0.15      1572
+                Japanese Rice Lager       0.65      0.79      0.71       308
+         Keller Bier / Zwickel Bier       0.23      0.06      0.09       525
+                      Kristalweizen       0.25      0.00      0.01       426
+                              Kvass       1.00      0.02      0.03        63
+                             Kölsch       0.42      0.12      0.18      1678
+                     Lambic - Fruit       0.54      0.65      0.59      2152
                  Lambic - Unblended       0.00      0.00      0.00       227
-                        Light Lager       0.49      0.48      0.49      2759
-                   Low Alcohol Beer       0.64      0.04      0.08       222
-              Maibock / Helles Bock       0.19      0.07      0.10      2087
-                 Milk / Sweet Stout       0.31      0.47      0.37      2623
-                Munich Dunkel Lager       0.34      0.21      0.26      1566
-                Munich Helles Lager       0.40      0.15      0.22      1600
-               Märzen / Oktoberfest       0.30      0.11      0.17      4777
-                      Oatmeal Stout       0.25      0.22      0.24      3646
+                        Light Lager       0.53      0.46      0.49      2759
+                   Low Alcohol Beer       0.00      0.00      0.00       222
+              Maibock / Helles Bock       0.18      0.09      0.12      2087
+                 Milk / Sweet Stout       0.30      0.47      0.37      2623
+                Munich Dunkel Lager       0.38      0.18      0.25      1566
+                Munich Helles Lager       0.38      0.13      0.19      1600
+               Märzen / Oktoberfest       0.30      0.11      0.16      4777
+                      Oatmeal Stout       0.26      0.18      0.21      3646
                             Old Ale       0.47      0.25      0.32      2927
-                        Pumpkin Ale       0.35      0.13      0.18      3122
-                   Quadrupel (Quad)       0.38      0.51      0.43      3737
-                          Rauchbier       0.72      0.54      0.62       817
+                        Pumpkin Ale       0.38      0.12      0.18      3122
+                   Quadrupel (Quad)       0.45      0.41      0.43      3737
+                          Rauchbier       0.76      0.45      0.57       817
                          Roggenbier       0.00      0.00      0.00       101
-             Russian Imperial Stout       0.31      0.41      0.35     10792
-                           Rye Beer       0.29      0.18      0.22      2054
-                              Sahti       0.91      0.20      0.32       198
-             Saison / Farmhouse Ale       0.38      0.43      0.40      6327
-                        Schwarzbier       0.42      0.28      0.33      1956
-             Scotch Ale / Wee Heavy       0.41      0.18      0.25      3460
-                       Scottish Ale       0.41      0.29      0.34      1827
-Scottish Gruit / Ancient Herbed Ale       0.88      0.75      0.81       557
+             Russian Imperial Stout       0.31      0.40      0.35     10792
+                           Rye Beer       0.29      0.14      0.19      2054
+                              Sahti       0.00      0.00      0.00       198
+             Saison / Farmhouse Ale       0.36      0.40      0.38      6327
+                        Schwarzbier       0.43      0.20      0.28      1956
+             Scotch Ale / Wee Heavy       0.38      0.16      0.23      3460
+                       Scottish Ale       0.41      0.22      0.28      1827
+Scottish Gruit / Ancient Herbed Ale       0.87      0.77      0.82       557
                         Smoked Beer       0.00      0.00      0.00       556
-                             Tripel       0.30      0.20      0.24      6074
-                       Vienna Lager       0.21      0.04      0.07      1865
-                         Weizenbock       0.55      0.31      0.40      1922
+                             Tripel       0.32      0.18      0.23      6074
+                       Vienna Lager       0.16      0.04      0.06      1865
+                         Weizenbock       0.57      0.28      0.38      1922
                           Wheatwine       0.00      0.00      0.00       731
-                      Winter Warmer       0.29      0.15      0.20      4130
-                            Witbier       0.35      0.18      0.24      5896
+                      Winter Warmer       0.34      0.12      0.18      4130
+                            Witbier       0.40      0.16      0.23      5896
 
-                           accuracy                           0.30    317323
-                          macro avg       0.37      0.24      0.26    317323
-                       weighted avg       0.33      0.30      0.29    317323
+                           accuracy                           0.27    317323
+                          macro avg       0.33      0.20      0.21    317323
+                       weighted avg       0.32      0.27      0.25    317323
 
 </pre>
 </div>
@@ -13992,7 +13933,7 @@ Scottish Gruit / Ancient Herbed Ale       0.88      0.75      0.81       557
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[31]:</div>
+<div class="prompt input_prompt">In&nbsp;[54]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="n">models_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">artefact_prefix</span><span class="si">}</span><span class="s1">_model&#39;</span>
@@ -14014,7 +13955,7 @@ Scottish Gruit / Ancient Herbed Ale       0.88      0.75      0.81       557
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[32]:</div>
+<div class="prompt input_prompt">In&nbsp;[55]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_val</span><span class="p">,</span> <span class="n">X_test</span><span class="p">])</span>
@@ -14034,13 +13975,13 @@ Scottish Gruit / Ancient Herbed Ale       0.88      0.75      0.81       557
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[32]:</div>
+    <div class="prompt output_prompt">Out[55]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[&#39;D:\\git\\assignment_2\\models\\4_pytorch_pipe.sav&#39;]</pre>
+<pre>[&#39;D:\\git\\assignment_2\\models\\3_pytorch_pipe.sav&#39;]</pre>
 </div>
 
 </div>
@@ -14059,7 +14000,7 @@ Scottish Gruit / Ancient Herbed Ale       0.88      0.75      0.81       557
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[33]:</div>
+<div class="prompt input_prompt">In&nbsp;[56]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="n">models_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">artefact_prefix</span><span class="si">}</span><span class="s1">_label_encoder&#39;</span>
@@ -14076,30 +14017,17 @@ Scottish Gruit / Ancient Herbed Ale       0.88      0.75      0.81       557
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[33]:</div>
+    <div class="prompt output_prompt">Out[56]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[&#39;D:\\git\\assignment_2\\models\\4_pytorch_label_encoder.sav&#39;]</pre>
+<pre>[&#39;D:\\git\\assignment_2\\models\\3_pytorch_label_encoder.sav&#39;]</pre>
 </div>
 
 </div>
 
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
-</pre></div>
-
-    </div>
 </div>
 </div>
 
