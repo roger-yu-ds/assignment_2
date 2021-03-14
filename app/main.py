@@ -12,8 +12,6 @@ import uvicorn
 from src.models.pipes import load_preprocessing_pipe
 from src.models.pipes import load_label_encoder
 from src.models.pytorch import get_device
-from src.models.pytorch import PytorchClassification
-
 
 app = FastAPI()
 
