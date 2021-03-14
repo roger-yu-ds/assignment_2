@@ -1,5 +1,4 @@
-assignment_2
-==============================
+# assignment_2
 
 This project is assignment 2 of the MDSI (Master of Data Science and 
 Innovation) degree, subject ADSI (Advanced Data Science for Innovation), at 
@@ -9,20 +8,42 @@ fitting a model, including all the hyperparameter tuning.
    
 2. Deployment: Creating a docker image and deploying the image to Heroku
 
-Modelling
--------------
+## Modelling
+
 All model artefacts are saved into the `/models` directory. Each of the 
 experimental models will have a prefix, e.g. `2_pytorch`. The best 
 performing model will be duplicated and named `model`. Accordingly, the other
 artefacts that support `model` will be named `pipeline.sav` and 
 `label_encoder.sav`.
 
-Deployment
--------------
-The deployment is done using a Dockerfile, which is sent to Heroku.
+## Deployment
 
-Project Organization
-------------
+The deployment is done using the `/Dockerfile` and the `heroku/yml`, which is 
+sent to Heroku.
+
+The files/directories required for production are:
+* `/app`: which contains the code to run the FastAPI app
+* `/models`:
+  - `/model.torch`: the serialised neural network PyTorch model
+  - `/label_encoder.sav`: used to convert the prediction (numerical) into the 
+    beer style (string)
+  - `/pipe.sav`: used to process the inputs into a format compatible with the 
+    model
+* `/Dockerfile`: the instructions to build the container
+* `/requirements.txt`: the list of packages to be installed in the container
+* `/heroku.yml`: the instructions for Heroku to run Docker 
+* `/src`: contains the source code
+    
+## Steps to deploy to Heroku
+1. Create a new app in the GUI, https://dashboard.heroku.com/new-app
+1. Install the Heroku cli
+1. Login from cli
+1. Create a Heroku git remote `heroku git:remote -a app-name`
+1. Set the stack type to be container type `heroku set:stack container`
+1. Push to Heroku `git push heroku branch-name`
+
+
+## Project Organization
 
     ├── LICENSE
     ├── Makefile           <- Makefile with commands like `make data` or `make train`
