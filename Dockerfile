@@ -12,7 +12,9 @@ RUN pip3 install torch==1.7.1+cpu -f https://download.pytorch.org/whl/torch_stab
 
 COPY ./app /app
 
-COPY ./models /models
+COPY ./models/model.torch /models/model.torch
+COPY ./models/label_encoder.sav /models/label_encoder.sav
+COPY ./models/pipe.sav /models/pipe.sav
 
 COPY ./src /src
 
