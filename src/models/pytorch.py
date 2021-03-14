@@ -13,7 +13,34 @@ def get_device():
     return device
 
 
-class PytorchClassification(nn.Module):
+class PytorchClassification_2(nn.Module):
+    def __init__(self, n_features: int, n_classes: int):
+        super().__init__()
+        self.layer_1 = nn.Linear(n_features, 256)
+        self.batchnorm1 = nn.BatchNorm1d(256)
+        self.layer_2 = nn.Linear(256, 128)
+        self.batchnorm2 = nn.BatchNorm1d(128)
+        self.layer_out = nn.Linear(128, n_classes)
+
+        self.relu = nn.ReLU()
+        self.dropout = nn.Dropout(p=0.2)
+
+    def forward(self, x):
+        x = self.layer_1(x)
+        x = self.batchnorm1(x)
+        x = self.relu(x)
+
+        x = self.layer_2(x)
+        x = self.batchnorm2(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+
+        x = self.layer_out(x)
+
+        return x
+
+
+class PytorchClassification_3(nn.Module):
     def __init__(self, n_features: int, n_classes: int):
         super().__init__()
         self.layer_1 = nn.Linear(n_features, 512)
@@ -48,7 +75,7 @@ class PytorchClassification(nn.Module):
         return x
 
 
-class PytorchClassification_4(nn.Module):
+class PytorchClassification_5(nn.Module):
     def __init__(self, n_features: int, n_classes: int):
         super().__init__()
         self.layer_1 = nn.Linear(n_features, 1024)
@@ -90,7 +117,7 @@ class PytorchClassification_4(nn.Module):
         return x
 
 
-class PytorchClassification_5(nn.Module):
+class PytorchClassification_6(nn.Module):
     def __init__(self, n_features: int, n_classes: int):
         super().__init__()
         self.layer_1 = nn.Linear(n_features, 2048)
@@ -132,7 +159,7 @@ class PytorchClassification_5(nn.Module):
         return x
 
 
-class PytorchClassification_7(nn.Module):
+class PytorchClassification_8(nn.Module):
     def __init__(self, n_features: int, n_classes: int):
         super().__init__()
         self.layer_1 = nn.Linear(n_features, 4096)
@@ -180,7 +207,7 @@ class PytorchClassification_7(nn.Module):
 
         return x
     
-    
+
 class PytorchDataset(Dataset):
     """
     Pytorch dataset
@@ -189,7 +216,7 @@ class PytorchDataset(Dataset):
     Attributes
     ----------
     X_tensor : Pytorch tensor
-        Features tensor
+        Features tensofr
     y_tensor : Pytorch tensor
         Target tensor
 
@@ -268,7 +295,7 @@ def train_classification(train_data,
         # Reset gradients
         optimizer.zero_grad()
 
-        # Load data to specified devicetarget_class
+        # Load data to specified device target_class
         feature, target_class = feature.to(device), target_class.to(device).to(torch.long)
 
         # Make predictions
@@ -308,7 +335,7 @@ def test_classification(test_data, model, criterion, batch_size, device,
         Pytorch Model
     criterion: function
         Loss function
-    bacth_size : int
+    batch_size : int
         Number of observations per batch
     device : str
         Name of the device used for the model
