@@ -19,14 +19,6 @@ model = torch.load('../models/model.torch',
                    map_location=lambda storage, loc: storage)
 
 
-class Observation(BaseModel):
-    brewery_name: str
-    review_aroma: int
-    review_appearance: int
-    review_palate: int
-    review_taste: int
-
-
 @app.get('/')
 def read_root():
     root_dict = {
