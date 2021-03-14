@@ -1,19 +1,12 @@
 numpy==1.18.1
 pandas~=1.0.3
 scikit-learn~=0.22.1
-#torch @ https://download.pytorch.org/whl/cu110/torch-1.7.1%2Bcu110-cp39-cp39-win_amd64.whl
-#torchviz~=0.0.1
-#torch~=1.7.1+cu110
 uvicorn~=0.13.4
 joblib~=0.15.1
 python-dotenv~=0.15.0
 typing~=3.7.4.3
-click~=7.1.2
-matplotlib~=3.2.1
-seaborn~=0.10.0
 setuptools~=47.1.1
 fastapi~=0.63.0
 starlette==0.13.6
 category_encoders
-# torch==1.7.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
 gunicorn
